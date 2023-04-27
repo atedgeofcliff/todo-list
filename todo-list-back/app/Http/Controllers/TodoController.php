@@ -15,9 +15,9 @@ class TodoController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {   
+    {     
         try {
-            $todos = Todo::all();
+            $todos = Todo::where('user_id',2)->get();
             return response()->json([
                 'status' => 'success',
                 'code' => 201,
@@ -48,6 +48,7 @@ class TodoController extends Controller
                 'description'=>$request->description,
                 'due_date'=>$request->due_date,
                 'is_done'=>$request->is_done,
+                'user_id'=>$request->user_id,
             ]
           );
             return response()->json([

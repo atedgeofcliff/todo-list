@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTodosTable extends Migration
+class CreatePermissionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,15 @@ class CreateTodosTable extends Migration
      */
     public function up()
     {
-        Schema::create('todos', function (Blueprint $table) {
+        Schema::create('permissions', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('description');
-            $table->date('due_date');
-            $table->boolean('is_done');
             $table->foreignId('user_id')->constrained('users');
-
-            $table->timestamps(); 
+            $table->integer('from_user_id');
+            $table->boolean('create')->default(false);
+            $table->boolean('read')->default(false);
+            $table->boolean('update')->default(false);
+            $table->boolean('delete')->default(false);
+            $table->timestamps();
         });
     }
 
@@ -32,6 +32,6 @@ class CreateTodosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('todos');
+        Schema::dropIfExists('permissions');
     }
 }
