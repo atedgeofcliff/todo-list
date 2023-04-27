@@ -1,10 +1,12 @@
+import React from "react";
 import "./App.css";
 import "antd/dist/reset.css";
-import MainPage from "./components/MainPage";
+import AppRoutes from "./components/AppPages/AppRoutes";
+
 export default function App() {
   return (
     <div className="App">
-      <MainPage></MainPage>
+      <AppRoutes></AppRoutes> {/* <MainPage></MainPage> */}
     </div>
   );
 }

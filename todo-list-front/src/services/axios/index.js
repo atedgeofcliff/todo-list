@@ -1,4 +1,5 @@
 import axios from "axios";
+import { GraphQLClient, gql } from "graphql-request";
 
 // const token = localStorage.getItem("token");
 // export default axios.create({
@@ -8,6 +9,12 @@ import axios from "axios";
 //     // Authorization: `Bearer ${token}`,
 //   },
 // });
+
+const graphQLClient = new GraphQLClient(`http://localhost:82/api`, {
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 const client = (() => {
   return axios.create({

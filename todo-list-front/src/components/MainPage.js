@@ -1,40 +1,31 @@
 import { Layout } from "antd";
-import { Content, Header } from "antd/es/layout/layout";
-import React, { useEffect, useState } from "react";
+import { Content } from "antd/es/layout/layout";
+import React, { useEffect } from "react";
 import ListOfTodos from "./ListOfTodos";
 import AddTodo from "./AddTodo";
 import { useQuery } from "@tanstack/react-query";
 import TodoService from "../services/todolist";
-import { proxy, useSnapshot } from "valtio";
-import { Radio } from "antd";
+import { useSnapshot } from "valtio";
 import Filter from "./Filter";
-
-const state = proxy({
-  filter: "all",
-  filteredStartDate: null,
-  filteredEndDate: null,
-  todos: [],
-});
-
-const UseDateFilterTodos = (filteredStartDate, filteredEndDate) => {};
+import { state } from "../services/state";
+import AppSideMenu from "./AppPages/AppSideMenu";
+import AppHeader from "./AppPages/AppHeader";
 
 const useFilteredTodos = () => {
   const { filter, todos, filteredStartDate, filteredEndDate } =
     useSnapshot(state);
   let filteredTodos = todos;
   if (filter === "done") {
-    console.log("bayrak1111");
-    filteredTodos = filteredTodos.filter((todo) => todo.is_done === 1);
+    filteredTodos = filteredTodos.filter(
+      (todo) => todo.is_done === 1 || todo.is_done === true
+    );
   }
   if (filter === "not_done") {
-    console.log("bayrak222");
-
-    filteredTodos = filteredTodos.filter((todo) => todo.is_done === 0);
+    filteredTodos = filteredTodos.filter(
+      (todo) => todo.is_done === 0 || todo.is_done === false
+    );
   }
-  console.log(filteredStartDate, filteredEndDate);
   if (filteredStartDate !== null && filteredEndDate !== null) {
-    console.log("bayrak333");
-
     filteredTodos = filteredTodos.filter((todo) => {
       const date = todo.due_date;
       return (
@@ -42,82 +33,46 @@ const useFilteredTodos = () => {
         Date.parse(date) <= Date.parse(filteredEndDate)
       );
     });
-    // return todos.filter((todo) => todo.due_date === 0);
   }
   return filteredTodos;
 };
 export default function MainPage() {
-  const [allTodos, setAllTodos] = useState([]);
   const { data: todos, isLoading: isLoadingTodos } = useQuery(["todos"], () =>
     TodoService.getTodos()
   );
 
   const filtered = useFilteredTodos();
-  console.log("filtereddddd", filtered);
   useEffect(() => {
     if (!isLoadingTodos) {
-      // setAllTodos(todos);
       state.todos = todos;
     }
   }, [isLoadingTodos]);
 
   return (
-    <Layout>
-      <Header
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 1,
-          width: "100%",
-        }}
-      >
-        sadadsa
-        <div
+    <Layout
+      style={{
+        minHeight: "100vh",
+      }}
+    >
+      <AppSideMenu></AppSideMenu>
+      <Layout>
+        <AppHeader></AppHeader>
+
+        <Content
+          className="site-layout"
           style={{
-            float: "left",
-            width: 120,
-            height: 31,
-            margin: "16px 24px 16px 0",
-            background: "rgba(255, 255, 255, 0.2)",
+            padding: "0 50px",
           }}
-        />
-      </Header>
-      <Content
-        className="site-layout"
-        style={{
-          padding: "0 50px",
-        }}
-      >
-        <Filter state={state} />
-        <AddTodo
-          // allTodos={allTodos}
-          state={state}
-          // setAllTodos={setAllTodos}
-        />
-        <ListOfTodos
-          isLoadingTodos={isLoadingTodos}
-          filtered={filtered}
-          state={state}
-          // setAllTodos={setAllTodos}
-        ></ListOfTodos>
-      </Content>
+        >
+          {state.createPermission ? <AddTodo state={state} /> : <></>}
+          <Filter state={state} />
+          <ListOfTodos
+            isLoadingTodos={isLoadingTodos}
+            filtered={filtered}
+            state={state}
+          ></ListOfTodos>
+        </Content>
+      </Layout>
     </Layout>
   );
 }
-
-/*  const addnewTodo = (e) => {
-    console.log("eeeeeee", e);
-    setAllTodos([...allTodos, e]);
-  }; */
-
-/* <Row className="row">
-            <Col flex="2 1 5%">
-              <Input placeholder="Name" />
-            </Col>
-            <Col flex="2 1 5%">
-              <DatePicker size={"middle"} />
-            </Col>
-            <Col flex="2 1 5%">
-              <TextArea placeholder="Description" rows={4} />
-            </Col>
-          </Row> */

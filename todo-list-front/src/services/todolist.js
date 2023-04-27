@@ -1,4 +1,6 @@
 import axios from "./axios";
+import * as qrapql from "./graphql";
+
 // export const getTodos = () => (dispatch) => {
 //   return axios
 //     .get("allTodos")
@@ -14,6 +16,10 @@ export default class TodoService {
   static getTodos() {
     return axios({
       url: "/todos",
+      data: {
+        query: qrapql.GET_TODOS,
+      },
+      // query: qrapql.GET_TODOS,
       method: "GET",
     });
   }

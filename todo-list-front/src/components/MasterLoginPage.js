@@ -1,39 +1,28 @@
-import { Button, Form, Input, Row } from "antd";
-import UserService from "../services/user";
+import { Button, Form, Input, Row, Typography } from "antd";
 import { useMutation } from "@tanstack/react-query";
-import { useLocation, useNavigate } from "react-router-dom";
-import { state } from "../services/state";
+import { useNavigate } from "react-router-dom";
+import UserService from "../services/user";
 
-export default function LoginPage() {
-  const location = useLocation();
+export default function MasterLoginPage() {
   const navigate = useNavigate();
-  const login = useMutation({
+  const redirectToMainPage = () => {
+    navigate("/", { replace: true });
+  };
+  const masterLogin = useMutation({
     mutationFn: (loginCredentials) =>
       UserService.login(loginCredentials).then((res) => {
         if (res.id) {
-          if (location.pathname === "/login") {
-            localStorage.removeItem("masterUser");
-            localStorage.setItem("user", res.id);
-            navigate("/", { replace: true });
-            state.masterPermissions = res.get_permission;
-            state.userId = res.id;
-          }
-          if (location.pathname === "/masterLogin") {
-            localStorage.removeItem("user");
-            localStorage.setItem("masterUser", res.id);
-            navigate("/masterMain", { replace: true });
-          }
+          localStorage.setItem("user", res.id);
+          redirectToMainPage();
         }
       }),
   });
-
   const onFinish = (values) => {
     const loginCredentials = {
       email: values.email,
       password: values.password,
-      is_master: location.pathname === "/masterLogin",
     };
-    login.mutate(loginCredentials);
+    masterLogin.mutate(loginCredentials);
   };
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
@@ -63,6 +52,11 @@ export default function LoginPage() {
         onFinishFailed={onFinishFailed}
         autoComplete="off"
       >
+        <Typography.Title
+          style={{ marginBottom: "64px", color: "black", alignItems: "center" }}
+        >
+          Master Login
+        </Typography.Title>
         <Form.Item label="email" name="email" rules={[{ type: "email" }]}>
           <Input />
         </Form.Item>
